@@ -1,3 +1,7 @@
+requires.io
+os-sys
+setuptools
+tokenizer
 gunicorn
 requests
 wheel
