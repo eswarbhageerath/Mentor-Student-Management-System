@@ -7,10 +7,29 @@ import numpy as np
 class FaceLibPython:
     def __init__(self) :
         self.azureTableStorage=AzureTableStorage()
-    def stringEncodingToNumpyArray(self,encoding):
+    def stringEncodingToNumpyArray(self,encoding:str):
+        """convert tring encoding into numpy array
+
+        Args:
+            encoding (str): encoding in string format
+
+        Returns:
+            numpy array: string converted into numpy array
+        """
         return np.matrix(encoding).reshape(1,-1).A
 
-    def IsExistingPerson(self,image,userName):
+    def IsExistingPerson(self,image,userName:str):
+        """Checks if person exists in our table or not
+
+        Args:
+            image: image
+            userName (str): username of the current user
+
+        Returns:
+            list: returns [False,encoding in string format] if person does not exist
+                    returns [True,Encoding in string format,Name of the person,Is person Criminal or not as boolean,Person Id] if person exists
+        """
+       
         encoding=face_recognition.face_encodings(image)[0]
         encodingStr=np.array_str(encoding)
         allRows=self.azureTableStorage.getAllRows()
@@ -20,9 +39,22 @@ class FaceLibPython:
                     return [True,i["Encoding"],i["Name"],i["IsCriminal"],i["PersonId"]]
         return [False,encodingStr]
         
-    def clearAllFaces(self,userName):
+    def clearAllFaces(self,userName:str):
+        """clear all faces stored by the current user
+
+        Args:
+            userName (str): username of the current user
+        """
         self.azureTableStorage.clearAllRows(userName)
     def getPredsFaceDetectionPythonLibrary(self,image):
+        """_summary_
+
+        Args:
+            image : image
+
+        Returns:
+            List[Dict]: list of dict where keys in each dict are name of the person and location of the face in input image
+        """
         allRows=self.azureTableStorage.getAllRows()
         known_face_encodings=[]
         known_face_names=[]
@@ -53,5 +85,4 @@ class FaceLibPython:
             currentResult["Name"]=j[1]
             currentResult["Location"]=j[0]
             result.append(currentResult)
-        print("abc",result)
         return result

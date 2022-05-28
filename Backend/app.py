@@ -3,7 +3,7 @@ import glob
 import json
 from urllib.parse import urlparse
 import cv2
-from AzureFaceAPI import FaceDetector
+from AzureFaceAPI import AzureFaceClientLibraryClass
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename 
 import cv2
@@ -15,7 +15,7 @@ from PIL import Image
 import face_recognition
 from PIL import Image
 from AzureTableStorage import AzureTableStorage
-from ClassManagement import ClassManagement
+from ClassManagement import ClassroomManagement
 from DrowsinessDetection import DrowsinessDetection
 from FaceLibPython import FaceLibPython
 from datetime import date
@@ -25,7 +25,7 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 
-azureFaceDetector=FaceDetector()
+azureFaceDetector=AzureFaceClientLibraryClass()
 PERSON_GROUP_ID=azureFaceDetector.tryCreatePersonGroup(PERSON_GROUP_ID="persongroup")
         
 azureTableStorage=AzureTableStorage()
@@ -33,14 +33,16 @@ azureTableStorage=AzureTableStorage()
 faceLibPython =FaceLibPython()
 
 drowsinessDetectior=DrowsinessDetection()
-classManagement=ClassManagement()
+classManagement=ClassroomManagement()
     
+    
+#Identify faces in the input image and returns their (name,person id,criminal status,drowsy or not,face location, cropped image) for each face
 @app.route('/identifyfaces', methods = ['GET', 'POST'])
 @cross_origin()
 def identifyfaces():
     if request.method == 'POST':
         userName=request.form['UserName']
-        print(userName)
+        
         saveImage(request)
         image=face_recognition.load_image_file("temp.jpg")
         locations=face_recognition.face_locations(image)
@@ -72,7 +74,8 @@ def identifyfaces():
         return response
 
 
-
+   
+#Adds or Updates face data like their (name,person id,criminal status) for each face, in database  
 @app.route('/confirmfaces', methods = ['GET', 'POST'])
 @cross_origin()
 def confirmfaces():
@@ -82,7 +85,7 @@ def confirmfaces():
         body=json.loads(request.form['Body'])
         print(body)
         userName=request.form['UserName']
-        print(userName)
+        
         response={}
         needToTrain=False
         for i in range(len(body)):
@@ -93,7 +96,7 @@ def confirmfaces():
             currentFace=image[top:bottom, left:right]
             im = Image.fromarray(currentFace)
             im.save("currentFace.jpg")
-            print("confination")
+            print("confirmation")
             try:
                 faceLibPythonResult=faceLibPython.IsExistingPerson(face_recognition.load_image_file('currentFace.jpg'),userName)
                 encoding=faceLibPythonResult[1]
@@ -101,6 +104,7 @@ def confirmfaces():
                     Person_Id=faceLibPythonResult[4]
                 else:
                     isExisting,Person_Id=azureFaceDetector.tryCreatePersonGroupPerson("Man",glob.glob('currentFace.jpg'),PERSON_GROUP_ID)
+                    print(isExisting)
                     needToTrain=True
                 azureTableStorage.addUser(name,encoding,Person_Id,body[i]["IsCriminal"],userName)
                 response[i]["Name"]=name
@@ -111,12 +115,14 @@ def confirmfaces():
             azureFaceDetector.trainPersonGroup(PERSON_GROUP_ID)
         return response
     
+    
+#creates new class if doesnt exist
 @app.route('/createclass', methods = ['GET', 'POST'])
 @cross_origin()
 def createclass():
     if request.method == 'POST':
         userName=request.form['UserName']
-        print(userName)
+        
         className=request.form['ClassName']
         print(className)
         row=classManagement.getClassRow(userName,className)
@@ -126,35 +132,38 @@ def createclass():
             return {"response":"Class Created"}
         else:
             return {"response":"Class Already Exists"}
-        
+
+#returns list of all classes created by current user     
 @app.route('/getallclasses', methods = ['GET', 'POST'])
 @cross_origin()
 def getallclasses():
     if request.method == 'POST':
         userName=request.form['UserName']
-        print(userName)
+        
         classes=classManagement.getAllClasses(userName)
         return {"classes": classes}
         
-        
+
+#returns list of person ids of students registred in the given class       
 @app.route('/getregisteredids', methods = ['GET', 'POST'])
 @cross_origin()
 def getRegisteredIds():
     if request.method == 'POST':
         userName=request.form['UserName']
-        print(userName)
+        
         className=request.form['ClassName']
         print(className)
         students=classManagement.getAllStudentsOfClass(userName,className)
         return {"students": students}      
         
-        
+
+#Adds or registers student to the given class      
 @app.route('/adduserstoclass', methods = ['GET', 'POST'])
 @cross_origin()
 def adduserstoclass():
     if request.method == 'POST':
         userName=request.form['UserName']
-        print(userName)
+        
         className=request.form['ClassName']
         print(className)
         personIds=request.form['PersonIds'].split("---")
@@ -162,13 +171,14 @@ def adduserstoclass():
         for personId in personIds:
             classManagement.addUserToClass(userName,className,personId)
         return {}
-    
+
+#Reemoves or unregisters student from the given class      
 @app.route('/removeusersfromclass', methods = ['GET', 'POST'])
 @cross_origin()
 def removeusersfromclass():
     if request.method == 'POST':
         userName=request.form['UserName']
-        print(userName)
+        
         className=request.form['ClassName']
         print(className)
         personIds=request.form['PersonIds'].split("---")
@@ -177,24 +187,22 @@ def removeusersfromclass():
             classManagement.removeUserFromClass(userName,className,personId)
         return {}
     
-
+#Takes attendance from the image provided to the given class     
 @app.route('/takeattendance', methods = ['GET', 'POST'])
 @cross_origin()
 def takeattendance():
     if request.method == 'POST':
         saveImage(request)
         image=face_recognition.load_image_file("temp.jpg")
-        body=json.loads(request.form['Body'])
-        print(body)
+        locations=face_recognition.face_locations(image)
+        print(locations)
         userName=request.form['UserName']
-        print(userName)
+        
         className=request.form['ClassName']
         print(className)
-        response={}
         personIds=[]
-        for i in range(len(body)):
-            top, right, bottom, left=body[i]["Location"]
-            response[i]={}
+        for i in range(len(locations)):
+            top, right, bottom, left=locations[i]
             currentFace=image[top:bottom, left:right]
             im = Image.fromarray(currentFace)
             im.save("currentFace.jpg")
@@ -206,17 +214,37 @@ def takeattendance():
             except Exception as e:
                 print(e)     
         classManagement.markUsersPresent(userName,personIds,className,str(date.today())) 
-       
-        return response
+        
+        return {}
 
+#returns attendance report of the given class in the form of map where keys are dates and values of names of the students attended to that class on that day
+@app.route('/attendancereport', methods = ['GET', 'POST'])
+@cross_origin()
+def attendancereport():
+    if request.method == 'POST':
+        
+        userName=request.form['UserName']
+        
+        className=request.form['ClassName']
+        print(className)
+        attendanceReportWithPersonId=classManagement.getAttendanceReport(userName,className)
+        
+        personIdNameMapping=azureTableStorage.getPersonIdNameMapping(userName)
+        attendanceReportWithName={}
+        for date in attendanceReportWithPersonId:
+            currentNames=[]
+            for personId in attendanceReportWithPersonId[date]:
+                currentNames.append(personIdNameMapping[personId])
+            attendanceReportWithName[date]=currentNames
+        return attendanceReportWithName
 
-   
+#clears all face data stored by current user
 @app.route('/clearazurefaces', methods = ['GET', 'POST'])
 @cross_origin()
 def clearAzureFaces():
     if request.method == 'POST':
         userName=request.form['UserName']
-        print(userName)
+        
         faceLibPython.clearAllFaces(userName)
         return {"clearedFaces":"Done"}
     
@@ -235,18 +263,14 @@ def getFaces():
         predictions={"locations":face_locations}
         return predictions
     
-    
+#saves the image sent in Request 
 def saveImage(request):
     f = request.files['File']
     f.save(secure_filename('temp.jpg'))
     image=cv2.imread('temp.jpg')
     image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     return image
-
-def getImageArray(request):
-    f = request.files['File']
-    f.save(secure_filename('temp.jpg'))
-    return cv2.imread('temp.jpg')          
+  
 
 if __name__ == '__main__':
    app.run(debug=True)

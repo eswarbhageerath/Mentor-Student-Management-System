@@ -1,0 +1,17 @@
+gunicorn
+requests
+wheel
+azure-data-tables
+azure-cognitiveservices-vision-face
+tensorflow
+face_recognition
+Flask
+Flask_Cors
+keras
+msrest
+numpy
+opencv_python
+Pillow
+pygame
+requests
+Werkzeug
