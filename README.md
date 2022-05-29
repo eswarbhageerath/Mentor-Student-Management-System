@@ -32,13 +32,13 @@ NOTE: Make sure you have node, python and pip installed in your system.
 
 - Class Management
     - Creating a new class
-    - Getting list of classes created by current user
-    - Mark attendance of a class via image upload or video camera
-    - Get Attendance report of the class
+    - Selecting a class from the list of classes created by current user
+    - Mark attendance of the selected class via image upload or video camera
+    - Get Attendance report of the selected class
 
 - Student Management
-    - Registering a student to a class
-    - Unregistering a student from a class  
+    - Registering a student to a selected class
+    - Unregistering a student from a selected class  
 
 NOTE: Use pc for best experience
 
