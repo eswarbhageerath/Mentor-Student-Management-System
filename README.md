@@ -25,10 +25,19 @@ NOTE: Make sure you have node, python and pip installed in your system.
 
 ## Features:
   - Drowsiness Detection
-    - Predictiong any studdent/person is drowsy using ML models
+    - Predicts if a student/person is drowsy or not using ML models
   - Preventing Crime
-    - Detects whether any person has criminal background 
+    - Detects if any person in the video or image has criminal background or not
   - Attendance Tracking
+    - Class Management
+      -Creating a new class
+      -Getting list of classes created by current user
+      -Mark attendance of a class via image upload or video camera
+      -Get Attendance report of the class
+
+    - Student Management
+      -Registering a student to a class
+      -Unregistering a student from a class
     
 
 NOTE: Use pc for best experience
