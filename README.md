@@ -29,6 +29,8 @@ NOTE: Make sure you have node, python and pip installed in your system.
   - Attendance Tracking - Class Management and Student Management
   
 ## Attendance Tracking:
+- Database
+    - Azure Table Storage
   - Class Management
     -Creating a new class
     -Getting list of classes created by current user
