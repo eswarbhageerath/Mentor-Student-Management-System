@@ -31,14 +31,14 @@ NOTE: Make sure you have node, python and pip installed in your system.
 ## Attendance Tracking:
 
 - Class Management
-    -Creating a new class
-    -Getting list of classes created by current user
-    -Mark attendance of a class via image upload or video camera
-    -Get Attendance report of the class
+    - Creating a new class
+    - Getting list of classes created by current user
+    - Mark attendance of a class via image upload or video camera
+    - Get Attendance report of the class
 
 - Student Management
-    -Registering a student to a class
-    -Unregistering a student from a class  
+    - Registering a student to a class
+    - Unregistering a student from a class  
 
 NOTE: Use pc for best experience
 
