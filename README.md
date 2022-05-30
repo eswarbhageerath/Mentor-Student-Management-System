@@ -2,7 +2,13 @@
 
 # Mentorsoft-engage22
 
-![language](https://img.shields.io/badge/-Microsoft%20Engage%2022-bluevoilet)
+![language](https://img.shields.io/badge/-Microsoft%20Engage%2022-bluevoilet) 
+![language](https://img.shields.io/badge/-React-green)
+![language](https://img.shields.io/badge/-Type%20Script-yellowgreen)
+![language](https://img.shields.io/badge/-Python-orange)
+![language](https://img.shields.io/badge/-Flask-blue)
+![language](https://img.shields.io/badge/-Numpy-pink)
+![language](https://img.shields.io/badge/-Azure-grey)
 
 This project is being developed for Microsoft Engage 2022 mentorship program. This is Mentor-Student Management System.
 
