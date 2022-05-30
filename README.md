@@ -73,6 +73,20 @@ NOTE: Use pc for best experience
   Visit http://localhost:3000/ to enjoy the app.
 
 
+
+## Design
+
+- High Level View
+
+![High Level  View](https://github.com/eswarbhageerath/Mentor-Student-Management-System/blob/master/HighLevel%20View.png)
+
+- Detailed View of UI and Backend
+
+![Detailed View of UI and Backend](https://github.com/eswarbhageerath/Mentor-Student-Management-System/blob/master/Detailed%20View%20of%20UI%20and%20Backend.png)
+
+- Detailed View of Models
+
+![Detailed View of Models](https://github.com/eswarbhageerath/Mentor-Student-Management-System/blob/master/Detailed%20View%20Of%20Models.png)
 #### If you like it please give it a star!! ⭐
 
 
